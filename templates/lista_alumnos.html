@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnos Registrados</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Lista de Alumnos (MySQL)</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha de Nacimiento</th>
+                    <th>Pasatiempos</th>
+                    <th>¿Qué le gusta hacer?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td>{{ alumno[0] }}</td>
+                    <td>{{ alumno[1] }}</td>
+                    <td>{{ alumno[2] }}</td>
+                    <td>{{ alumno[3] }}</td>
+                    <td>{{ alumno[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <a href="/">Volver al registro</a>
+    </div>
+</body>
+</html>
