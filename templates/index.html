@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 03 - MySQL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Registro de alumnos (MySQL)</h1>
+        <form action="/saludar" method="POST">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required>
+            <br><br>
+            
+            <label>Fecha de nacimiento / Cumpleaños:</label>
+            <input type="date" name="fecha_nacimiento" required>
+            <br><br>
+
+            <h3>Selecciona tus pasatiempos</h3>
+            <div class="contenedor-tarjetas">
+                <div class="tarjeta">
+                    <h4>Deportivos</h4>
+                    <label><input type="checkbox" name="pasatiempos" value="Fútbol"> Fútbol</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Béisbol"> Béisbol</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Ciclismo"> Ciclismo</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Caminar"> Caminar</label>
+                </div>
+
+                <div class="tarjeta">
+                    <h4>Culturales</h4>
+                    <label><input type="checkbox" name="pasatiempos" value="Lectura"> Lectura</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Música"> Música</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Pintura"> Pintura</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Teatro"> Teatro</label>
+                </div>
+
+                <div class="tarjeta">
+                    <h4>Esparcimiento</h4>
+                    <label><input type="checkbox" name="pasatiempos" value="Cine"> Cine</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Videojuegos"> Videojuegos</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Viajar"> Viajar</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Series"> Series</label>
+                </div>
+
+                <div class="tarjeta">
+                    <h4>Sociales</h4>
+                    <label><input type="checkbox" name="pasatiempos" value="Reuniones"> Reuniones</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Fiestas"> Fiestas</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Convivir"> Convivir</label>
+                    <label><input type="checkbox" name="pasatiempos" value="Redes sociales"> Redes sociales</label>
+                </div>
+            </div>
+
+            <h3>En pocas palabras, ¿qué te gusta hacer?</h3>
+            <textarea name="me_gusta" maxlength="100" required></textarea>
+            <br><br>
+            <button type="submit">Registrar</button>
+        </form>
+        <p>
+            <a href="/alumnos">Ver alumnos registrados</a>
+        </p>
+    </div>
+</body>
+</html>
