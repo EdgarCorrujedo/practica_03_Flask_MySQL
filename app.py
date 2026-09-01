@@ -74,3 +74,9 @@ def ver_alumnos():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
+@app.route('/limpiar')
+def limpiar():
+    import borrar
+    borrar.borrar()
+    return "¡Listo! Datos borrados. Regresa a la página anterior."
