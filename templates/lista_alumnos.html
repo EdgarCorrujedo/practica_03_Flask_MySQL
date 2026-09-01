@@ -3,36 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alumnos Registrados</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    <title>Lista de Alumnos Registrados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .btn-volver {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn-volver:hover {
+            background-color: #5a6268;
+        }
+        .sin-datos {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+    </style>
 </head>
 <body>
-    <div class="contenedor">
-        <h1>Lista de Alumnos (MySQL)</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Fecha de Nacimiento</th>
-                    <th>Pasatiempos</th>
-                    <th>¿Qué le gusta hacer?</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for alumno in alumnos %}
-                <tr>
-                    <td>{{ alumno[0] }}</td>
-                    <td>{{ alumno[1] }}</td>
-                    <td>{{ alumno[2] }}</td>
-                    <td>{{ alumno[3] }}</td>
-                    <td>{{ alumno[4] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <br>
-        <a href="/">Volver al registro</a>
-    </div>
+
+<div class="container">
+    <h2>Alumnos Registrados</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Pasatiempos</th>
+                <th>Gustos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alumno in alumnos %}
+            <tr>
+                <td>{{ alumno.id }}</td>
+                <td>{{ alumno.nombre }}</td>
+                <td>{{ alumno.fecha_nacimiento }}</td>
+                <td>{{ alumno.pasatiempos }}</td>
+                <td>{{ alumno.gustos }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="sin-datos">No hay alumnos registrados aún.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/" class="btn-volver">Registrar otro alumno</a>
+</div>
+
 </body>
 </html>
