@@ -4,81 +4,70 @@ import pymysql
 
 app = Flask(__name__)
 
-# Configuración de conexión a MySQL
-# Utiliza variables de entorno para Render o valores por defecto para pruebas locales
-MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
-MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
-MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', '')
-MYSQL_DB = os.environ.get('MYSQL_DB', 'practica03_db')
-MYSQL_PORT = int(os.environ.get('MYSQL_PORT', 3306))
-
 def get_db_connection():
     return pymysql.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DB,
-        port=MYSQL_PORT,
-        autocommit=True
+        host=os.environ.get('DB_HOST', 'localhost'),
+        user=os.environ.get('DB_USER', 'root'),
+        password=os.environ.get('DB_PASSWORD', ''),
+        database=os.environ.get('DB_NAME', 'practica03_db'),
+        port=int(os.environ.get('DB_PORT', 3306)),
+        cursorclass=pymysql.cursors.DictCursor
     )
 
-# Crear la tabla de alumnos si no existe
 def init_db():
     try:
         conn = get_db_connection()
-        with conn.cursor() as cursor:
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS alumnos (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    nombre VARCHAR(100) NOT NULL,
-                    fecha_nacimiento DATE NOT NULL,
-                    pasatiempos TEXT,
-                    me_gusta VARCHAR(100) NOT NULL
-                )
-            ''')
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL,
+                fecha DATE NOT NULL,
+                pasatiempos VARCHAR(255) NOT NULL,
+                preferencia VARCHAR(50) NOT NULL
+            )
+        ''')
+        conn.commit()
+        cursor.close()
         conn.close()
     except Exception as e:
-        print(f"Error al inicializar la base de datos: {e}")
+        print(f"Error al inicializar BD: {e}")
 
-# Inicializar tabla al arrancar la app
 init_db()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/saludar', methods=['POST'])
-def saludar():
+@app.route('/guardar', methods=['POST'])
+def guardar():
     nombre = request.form.get('nombre')
-    fecha_nacimiento = request.form.get('fecha_nacimiento')
-    pasatiempos_lista = request.form.getlist('pasatiempos')
-    pasatiempos = ", ".join(pasatiempos_lista)
-    me_gusta = request.form.get('me_gusta')
+    fecha = request.form.get('fecha')
+    pasatiempos = request.form.getlist('pasatiempos')
+    pasatiempos_str = ", ".join(pasatiempos)
+    preferencia = request.form.get('preferencia')
 
-    try:
-        conn = get_db_connection()
-        with conn.cursor() as cursor:
-            sql = "INSERT INTO alumnos (nombre, fecha_nacimiento, pasatiempos, me_gusta) VALUES (%s, %s, %s, %s)"
-            cursor.execute(sql, (nombre, fecha_nacimiento, pasatiempos, me_gusta))
-        conn.close()
-    except Exception as e:
-        print(f"Error al guardar los datos: {e}")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO usuarios (nombre, fecha, pasatiempos, preferencia)
+        VALUES (%s, %s, %s, %s)
+    ''', (nombre, fecha, pasatiempos_str, preferencia))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-    return redirect(url_for('alumnos'))
+    return redirect(url_for('lista'))
 
-@app.route('/alumnos')
-def alumnos():
-    lista_alumnos = []
-    try:
-        conn = get_db_connection()
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, fecha_nacimiento, pasatiempos, me_gusta FROM alumnos")
-            lista_alumnos = cursor.fetchall()
-        conn.close()
-    except Exception as e:
-        print(f"Error al consultar los datos: {e}")
-
-    return render_template('lista_alumnos.html', alumnos=lista_alumnos)
+@app.route('/lista')
+def lista():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM usuarios')
+    usuarios = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('lista.html', usuarios=usuarios)
 
 if __name__ == '__main__':
     app.run(debug=True)
