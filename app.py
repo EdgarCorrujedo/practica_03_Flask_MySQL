@@ -1,73 +1,54 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
 import pymysql
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
 def get_db_connection():
     return pymysql.connect(
-        host=os.environ.get('DB_HOST', 'localhost'),
-        user=os.environ.get('DB_USER', 'root'),
-        password=os.environ.get('DB_PASSWORD', ''),
-        database=os.environ.get('DB_NAME', 'practica03_db'),
-        port=int(os.environ.get('DB_PORT', 3306)),
+        host=os.environ.get('DB_HOST'),
+        user=os.environ.get('DB_USER'),
+        password=os.environ.get('DB_PASSWORD'),
+        database=os.environ.get('DB_NAME'),
+        port=int(os.environ.get('DB_PORT', 18781)),
         cursorclass=pymysql.cursors.DictCursor
     )
-
-def init_db():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nombre VARCHAR(100) NOT NULL,
-                fecha DATE NOT NULL,
-                pasatiempos VARCHAR(255) NOT NULL,
-                preferencia VARCHAR(50) NOT NULL
-            )
-        ''')
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print(f"Error al inicializar BD: {e}")
-
-init_db()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/guardar', methods=['POST'])
-def guardar():
+@app.route('/registrar', methods=['POST'])
+def registrar():
     nombre = request.form.get('nombre')
-    fecha = request.form.get('fecha')
+    fecha_nacimiento = request.form.get('fecha_nacimiento')
     pasatiempos = request.form.getlist('pasatiempos')
+    gustos = request.form.get('gustos')
+    
     pasatiempos_str = ", ".join(pasatiempos)
-    preferencia = request.form.get('preferencia')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO usuarios (nombre, fecha, pasatiempos, preferencia)
-        VALUES (%s, %s, %s, %s)
-    ''', (nombre, fecha, pasatiempos_str, preferencia))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO alumnos (nombre, fecha_nacimiento, pasatiempos, gustos) VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql, (nombre, fecha_nacimiento, pasatiempos_str, gustos))
+        connection.commit()
+    finally:
+        connection.close()
 
-    return redirect(url_for('lista'))
+    return redirect(url_for('ver_alumnos'))
 
-@app.route('/lista')
-def lista():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM usuarios')
-    usuarios = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template('lista.html', usuarios=usuarios)
+# RUTA CORREGIDA PARA EL ENLACE /alumnos
+@app.route('/alumnos')
+def ver_alumnos():
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM alumnos")
+            alumnos = cursor.fetchall()
+        return render_template('alumnos.html', alumnos=alumnos)
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
