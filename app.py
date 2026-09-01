@@ -1,4 +1,3 @@
-import borrar
 import os
 import pymysql
 from flask import Flask, render_template, request, redirect, url_for
