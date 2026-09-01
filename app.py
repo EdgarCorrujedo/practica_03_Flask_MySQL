@@ -11,6 +11,7 @@ def get_db_connection():
         password=os.environ.get('DB_PASSWORD'),
         database=os.environ.get('DB_NAME'),
         port=int(os.environ.get('DB_PORT', 18781)),
+        ssl={'ssl': {}},  # Requerido por Aiven
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -38,7 +39,6 @@ def registrar():
 
     return redirect(url_for('ver_alumnos'))
 
-# RUTA CORREGIDA PARA EL ENLACE /alumnos
 @app.route('/alumnos')
 def ver_alumnos():
     connection = get_db_connection()
@@ -46,7 +46,8 @@ def ver_alumnos():
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM alumnos")
             alumnos = cursor.fetchall()
-        return render_template('alumnos.html', alumnos=alumnos)
+        # Cambiado a 'lista_alumnos.html'
+        return render_template('lista_alumnos.html', alumnos=alumnos)
     finally:
         connection.close()
 
