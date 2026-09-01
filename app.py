@@ -11,9 +11,31 @@ def get_db_connection():
         password=os.environ.get('DB_PASSWORD'),
         database=os.environ.get('DB_NAME'),
         port=int(os.environ.get('DB_PORT', 18781)),
-        ssl={'ssl': {}},  # Requerido por Aiven
+        ssl={'ssl': {}},
         cursorclass=pymysql.cursors.DictCursor
     )
+
+def init_db():
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS alumnos (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    nombre VARCHAR(100),
+                    fecha_nacimiento DATE,
+                    pasatiempos TEXT,
+                    gustos TEXT
+                );
+            """)
+        connection.commit()
+    finally:
+        connection.close()
+
+try:
+    init_db()
+except Exception as e:
+    print(f"Error inicializando la base de datos: {e}")
 
 @app.route('/')
 def index():
@@ -46,7 +68,6 @@ def ver_alumnos():
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM alumnos")
             alumnos = cursor.fetchall()
-        # Cambiado a 'lista_alumnos.html'
         return render_template('lista_alumnos.html', alumnos=alumnos)
     finally:
         connection.close()
